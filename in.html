@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>戰神電競助手2026 - 官方網站</title>
+    <style>
+        /* 全局電競風格設計 */
+        body {
+            background-color: #0d1117;
+            color: #ffffff;
+            font-family: 'Segoe UI', Microsoft JhengHei, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: radial-gradient(circle, #161b22 0%, #0d1117 100%);
+            border: 2px solid #00f0ff;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #ff3e3e;
+            text-shadow: 0 0 10px rgba(255, 62, 62, 0.5);
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #8b949e;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        /* 網頁上下載按鈕 */
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, #00f0ff, #0072ff);
+            color: black;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 240, 255, 0.4);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(0, 240, 255, 0.7);
+        }
+
+        .btn-admin {
+            background: linear-gradient(45deg, #ff3e3e, #b30000);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 62, 62, 0.4);
+        }
+
+        .btn-admin:hover {
+            box-shadow: 0 6px 25px rgba(255, 62, 62, 0.7);
+        }
+
+        /* 彈出框彈窗（Modal）背景 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        /* 彈出框主體 */
+        .modal-box {
+            background-color: #161b22;
+            border: 2px solid #00f0ff;
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 450px;
+            text-align: left;
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.3);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            color: #00f0ff;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        .option-group {
+            margin-bottom: 20px;
+        }
+
+        .option-label {
+            display: block;
+            background-color: #21262d;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .option-label:hover {
+            border-color: #00f0ff;
+            background-color: #262c36;
+        }
+
+        .option-label input {
+            margin-right: 12px;
+            transform: scale(1.2);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-cancel {
+            background-color: #30363d;
+            color: #c9d1d9;
+        }
+
+        .btn-confirm {
+            background-color: #00f0ff;
+            color: black;
+        }
+
+        .btn-confirm:disabled {
+            background-color: #21262d;
+            color: #8b949e;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>戰神電競助手 2026</h1>
+        <p>專為頂級玩家打造的 Windows 遊戲防護與中央控制台</p>
+        
+        <div class="btn-group">
+            <button class="download-btn" onclick="openDownloadModal('user')">📥 用戶下載版</button>
+            <button class="download-btn btn-admin" onclick="openDownloadModal('admin')">🛡️ 系統下載版</button>
+        </div>
+    </div>
+
+    <!-- 彈出對話框 -->
+    <div class="modal-overlay" id="downloadModal">
+        <div class="modal-box">
+            <div class="modal-title">⚙️ Windows 系統相容性確認</div>
+            
+            <p style="color: #c9d1d9; font-size: 0.95rem; margin-bottom: 15px;">
+                請確認您目前的作業系統環境，勾選以解鎖【戰神電競助手】下載：
+            </p>
+
+            <div class="option-group">
+                <!-- 🎯 已同步更新：文字明確包含 Windows 7 與 Windows 8 -->
+                <label class="option-label">
+                    <input type="radio" name="os-version" value="win7up" onchange="checkSelection()">
+                    <strong>Windows 7 / 8 / 10 / 11 (64-bit) <span style="color: #00f0ff;">(推薦)</span></strong>
+                </label>
+                <label class="option-label">
+                    <input type="radio" name="os-version" value="old" onchange="checkSelection()">
+                    <strong>其他更舊版本系統 (Windows XP / Vista) <span style="color: #ff3e3e;">(不建議)</span></strong>
+                </label>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn btn-cancel" onclick="closeModal()">取消</button>
+                <button class="modal-btn btn-confirm" id="confirmBtn" disabled onclick="startDownload()">確認並下載</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedVersionType = '';
+
+        function openDownloadModal(type) {
+            selectedVersionType = type;
+            document.getElementById('downloadModal').style.display = 'flex';
+            const radios = document.getElementsByName('os-version');
+            radios.forEach(radio => radio.checked = false);
+            document.getElementById('confirmBtn').disabled = true;
+        }
+
+        function closeModal() {
+            document.getElementById('downloadModal').style.display = 'none';
+        }
+
+        function checkSelection() {
+            const radios = document.getElementsByName('os-version');
+            let selectedValue = '';
+            for (const radio of radios) {
+                if (radio.checked) {
+                    selectedValue = radio.value;
+                    break;
+                }
+            }
+            
+            const confirmBtn = document.getElementById('confirmBtn');
+            if (selectedValue === 'win7up') {
+                confirmBtn.disabled = false;
+                confirmBtn.style.backgroundColor = '#00f0ff';
+                confirmBtn.style.color = '#000000';
+            } else {
+                confirmBtn.disabled = true;
+                confirmBtn.style.backgroundColor = '#21262d';
+                confirmBtn.style.color = '#8b949e';
+                if(selectedValue === 'old') {
+                    alert('警告：戰神電競助手2026 基本系統要求為 Windows 7 / 8 以上版本，更舊系統將無法正常執行。');
+                }
+            }
+        }
+
+        function startDownload() {
+            closeModal();
+            
+            const baseUrl = "https://戰神電競助手2026.com";
+
+            if (selectedVersionType === 'user') {
+                const userFileName = "戰神電競助手2026_用戶下載版_Win10_User.exe";
+                alert('驗證成功！即將透過安全連線下載：\n' + userFileName);
+                window.location.href = baseUrl + encodeURIComponent(userFileName);
+                
+            } else if (selectedVersionType === 'admin') {
+                const adminFileName = "戰神電競助手2026_系統下載版_Win10_Admin.exe";
+                alert('驗證成功！即將透過安全連線下載：\n' + adminFileName);
+                window.location.href = baseUrl + encodeURIComponent(adminFileName);
+            }
+        }
+    </script>
+</body>
+</html>
