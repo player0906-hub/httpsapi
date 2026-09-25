@@ -1,0 +1,260 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>線上版蛋仔派對 - 歡樂衝刺</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(to bottom, #ffeb3b, #ff9800);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        h1 {
+            color: #fff;
+            text-shadow: 3px 3px 0px #e65100;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        /* 遊戲舞台 */
+        #gameStage {
+            width: 800px;
+            height: 400px;
+            background: linear-gradient(to bottom, #87CEEB, #E0F7FA);
+            border: 6px solid #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        /* 地板 */
+        #ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 40px;
+            background: #4CAF50;
+            border-top: 4px solid #8BC34A;
+        }
+        /* 玩家：黃色小蛋仔 */
+        #eggy {
+            position: absolute;
+            bottom: 40px;
+            left: 100px;
+            width: 50px;
+            height: 50px;
+            background: #FFD54F;
+            border: 3px solid #FF8F00;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 24px;
+            box-shadow: inset -4px -4px 0px #FFB300;
+            transition: transform 0.1s;
+        }
+        /* 蛋仔的眼睛 (利用裝飾表現) */
+        #eggy::before {
+            content: '👀';
+            font-size: 20px;
+        }
+        /* 障礙物：滾動的皮蛋滾石 */
+        #obstacle {
+            position: absolute;
+            bottom: 40px;
+            right: -50px;
+            width: 40px;
+            height: 40px;
+            background: #37474F;
+            border: 3px solid #212121;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #obstacle::before {
+            content: '💢';
+            font-size: 16px;
+        }
+        /* 計分板與介面 */
+        #scoreBoard {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            background: rgba(255,255,255,0.8);
+            padding: 5px 15px;
+            border-radius: 10px;
+        }
+        #startScreen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 10;
+        }
+        .btn {
+            background: #FF5722;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 15px;
+            box-shadow: 0 5px 0px #D84315;
+        }
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0px #D84315;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🥚 蛋仔派對：極限蹦跳 🥚</h1>
+    
+    <div id="gameStage" onclick="jump()">
+        <!-- 計分板 -->
+        <div id="scoreBoard">得分: <span id="score">0</span></div>
+        
+        <!-- 開始/結束畫面 -->
+        <div id="startScreen">
+            <h2 id="screenTitle">歡迎來到蛋仔派對！</h2>
+            <p id="screenDesc">點擊畫面或按「空白鍵」讓黃色蛋仔跳躍，躲避黑色滾石！</p>
+            <button class="btn" onclick="startGame(event)">開始派對</button>
+        </div>
+
+        <!-- 遊戲元素 -->
+        <div id="eggy"></div>
+        <div id="obstacle"></div>
+        <div id="ground"></div>
+    </div>
+
+    <script>
+        const eggy = document.getElementById('eggy');
+        const obstacle = document.getElementById('obstacle');
+        const scoreDisplay = document.getElementById('score');
+        const startScreen = document.getElementById('startScreen');
+        const screenTitle = document.getElementById('screenTitle');
+        const screenDesc = document.getElementById('screenDesc');
+
+        let isJumping = false;
+        let isPlaying = false;
+        let score = 0;
+        let gameLoop;
+        let obstacleLoop;
+        
+        // 物理參數
+        let eggyY = 40; // 距離底部高度
+        let gravity = 1.8;
+        let velocity = 0;
+        let obstacleX = 850;
+        let obstacleSpeed = 6;
+
+        // 監聽鍵盤空白鍵
+        document.addEventListener('keydown', function(event) {
+            if (event.code === 'Space') {
+                if (!isPlaying) {
+                    startGame(event);
+                } else {
+                    jump();
+                }
+            }
+        });
+
+        function startGame(event) {
+            event.stopPropagation(); // 防止觸發舞台點擊
+            // 初始化數據
+            score = 0;
+            scoreDisplay.innerText = score;
+            eggyY = 40;
+            velocity = 0;
+            obstacleX = 850;
+            obstacleSpeed = 6;
+            isPlaying = true;
+            startScreen.style.display = 'none';
+
+            // 啟動遊戲迴圈
+            gameLoop = requestAnimationFrame(updateGame);
+        }
+
+        function jump() {
+            if (!isPlaying || isJumping) return;
+            isJumping = true;
+            velocity = 22; // 跳躍初速度
+        }
+
+        function updateGame() {
+            if (!isPlaying) return;
+
+            // 1. 處理蛋仔跳躍與重力
+            if (isJumping || eggyY > 40) {
+                velocity -= gravity;
+                eggyY += velocity;
+
+                // 落地判定
+                if (eggyY <= 40) {
+                    eggyY = 40;
+                    isJumping = false;
+                    velocity = 0;
+                }
+            }
+            eggy.style.bottom = eggyY + 'px';
+            // 旋轉特效：跳躍時旋轉
+            eggy.style.transform = `rotate(${eggyY * 2}deg)`;
+
+            // 2. 處理障礙物移動
+            obstacleX -= obstacleSpeed;
+            if (obstacleX < -50) {
+                obstacleX = 850; // 重回右側
+                score += 10;     // 成功躲過加分
+                scoreDisplay.innerText = score;
+                
+                // 難度逐漸提升
+                if (obstacleSpeed < 15) obstacleSpeed += 0.5;
+            }
+            obstacle.style.left = obstacleX + 'px';
+
+            // 3. 碰撞偵測 (Hitbox)
+            // 蛋仔 X: 100~150, 障礙物 X: obstacleX ~ obstacleX+40
+            if (obstacleX > 100 && obstacleX < 150 && eggyY < 80) {
+                gameOver();
+                return;
+            }
+
+            gameLoop = requestAnimationFrame(updateGame);
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            cancelAnimationFrame(gameLoop);
+            
+            // 顯示結算畫面
+            screenTitle.innerText = "🥚 蛋仔被淘汰了！";
+            screenDesc.innerText = `最終得分: ${score} 分。別灰心，再挑戰一次吧！`;
+            startScreen.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
